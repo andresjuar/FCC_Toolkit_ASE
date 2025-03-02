@@ -1,46 +1,47 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const inputExpression = document.getElementById("logicExpression");
-    const generateButton = document.getElementById("generateTable");
-    const truthTableContainer = document.getElementById("truthTable");
+document.addEventListener("DOMContentLoaded", function () { //El programa se asegura que la página esté completamente cargada antes de hacer nada
+    const entradaExpresion = document.getElementById("expresionLogica"); 
+    const botonGenerar = document.getElementById("generarTabla");
+    const contenedorTablaVerdad = document.getElementById("tablaVerdad");
 
-    generateButton.addEventListener("click", function () {
-        const rawInput = inputExpression.value.trim();
-        if (rawInput === "") {
+    botonGenerar.addEventListener("click", function () {
+        const entrada = entradaExpresion.value.trim();
+        if (entrada === "") {
             alert("Por favor, ingresa una expresión lógica.");
-            return;
+            return
         }
 
         try {
-            const expressions = extractSubexpressions(rawInput);
-            const variables = getVariables(expressions);
-            const truthTable = generateTruthTable(variables, expressions);
-            displayTruthTable(truthTable, variables, expressions);
+            entradaMinusculas=entrada.toLowerCase();
+            const expresiones = extractSubexpresiones(entradaMinusculas);
+            const variables = getVariables(expresiones);
+            const tabladeVerdad = generateTruthTable(variables, expresiones);
+            displayTruthTable(tabladeVerdad, variables, expresiones);
         } catch (error) {
             alert("Error en la expresión lógica. Verifica la sintaxis.");
             console.error(error);
         }
     });
 
-    function getVariables(expressions) {
-        const regex = /[pqrstz]/g;
-        const matches = new Set();
-        expressions.forEach(expr => {
-            (expr.match(regex) || []).forEach(v => matches.add(v));
+    function getVariables(expresiones) {
+        const letras = /[pqrstz]/g;
+        const literales = new Set();
+        expresiones.forEach(expr => {
+            (expr.match(letras) || []).forEach(v => literales.add(v));
         });
-        return [...matches].sort();
+        return [...literales].sort();
     }
 
-    function generateTruthTable(variables, expressions) {
-        const numRows = Math.pow(2, variables.length);
+    function generateTruthTable(variables, expresiones) {
+        const numFilas = Math.pow(2, variables.length);
         const table = [];
 
-        for (let i = 0; i < numRows; i++) {
+        for (let i = 0; i < numFilas; i++) {
             const row = {};
             variables.forEach((variable, index) => {
                 row[variable] = Boolean((i >> (variables.length - index - 1)) & 1);
             });
 
-            expressions.forEach(expression => {
+            expresiones.forEach(expression => {
                 row[expression] = evaluateExpression(expression, row);
             });
 
@@ -51,10 +52,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function evaluateExpression(expression, values) {
-        let expr = expression
+        let expr = expression.toLowerCase()
             .replace(/¬/g, "!")  // Negación
             .replace(/~/g, "!")  // Alternativa de negación
             .replace(/∧/g, "&&") // Conjunción
+            .replace(/\^/g, "&&") //Conjunción
             .replace(/v/g, "||") // Disyunción
             .replace(/(\w)\s*→\s*(\w)/g, "!$1 || $2")  // Implicación p → q es equivalente a !p ∨ q
             .replace(/↔/g, "==="); // Bicondicional p ↔ q es equivalente a (p && q) || (!p && !q)
@@ -66,12 +68,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         return Boolean(new Function(`return ${expr};`)());
     }
-   
 
-    function extractSubexpressions(expression) {
-        let subexpressions = new Set();
+
+    function extractSubexpresiones(expression) {
+        let subexpresiones = new Set();
         let stack = [];
-        
+
         // Extraer subexpresiones contenidas en paréntesis
         for (let i = 0; i < expression.length; i++) {
             if (expression[i] === "(") {
@@ -80,36 +82,36 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (stack.length > 0) {
                     let start = stack.pop();
                     let subexpr = expression.substring(start, i + 1);
-                    subexpressions.add(subexpr);
+                    subexpresiones.add(subexpr);
                 }
             }
         }
-    
+
         // Desglosar negaciones individuales y operadores lógicos
-        let negationRegex = /[¬~][pqrst]/g;
+        let negationRegex = /[¬~][pqrstz]/g;
         let match;
         while ((match = negationRegex.exec(expression)) !== null) {
-            subexpressions.add(match[0]);
+            subexpresiones.add(match[0]);
         }
-    
-        // Agregar la expresión completa y las variables individuales
-        subexpressions.add(expression);
-    
-        // Ordenar expresiones correctamente
-        return [...subexpressions];
-    }
-    
-        
-    
 
-    function displayTruthTable(table, variables, expressions) {
+        // Agregar la expresión completa y las variables individuales
+        subexpresiones.add(expression);
+
+        // Ordenar expresiones correctamente
+        return [...subexpresiones];
+    }
+
+
+
+
+    function displayTruthTable(table, variables, expresiones) {
         let html = "<table class='table table-bordered table-dark'><thead><tr>";
 
         variables.forEach(variable => {
             html += `<th>${variable}</th>`;
         });
 
-        expressions.forEach(expression => {
+        expresiones.forEach(expression => {
             html += `<th>${expression}</th>`;
         });
 
@@ -121,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 html += `<td>${row[variable] ? "V" : "F"}</td>`;
             });
 
-            expressions.forEach(expression => {
+            expresiones.forEach(expression => {
                 html += `<td>${row[expression] ? "V" : "F"}</td>`;
             });
 
@@ -129,6 +131,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         html += "</tbody></table>";
-        truthTableContainer.innerHTML = html;
+        contenedorTablaVerdad.innerHTML = html;
     }
 });
