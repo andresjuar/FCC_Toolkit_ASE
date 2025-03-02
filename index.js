@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function getVariables(expressions) {
-        const regex = /[pqrst]/g;
+        const regex = /[pqrstz]/g;
         const matches = new Set();
         expressions.forEach(expr => {
             (expr.match(regex) || []).forEach(v => matches.add(v));
