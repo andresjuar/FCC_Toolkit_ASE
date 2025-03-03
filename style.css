@@ -19,10 +19,11 @@ body {
 
 .header {
     color: aliceblue;
+	margin-bottom: 40px;
 }
 
 .container{
-    margin-top: 8%;
+    margin-top: 40px;
 }
 
 #truthTable {

@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", function () { //El programa se ase
             .replace(/\^/g, "&&") //Conjunción
             .replace(/v/g, "||") // Disyunción
             .replace(/(\w)\s*→\s*(\w)/g, "!$1 || $2")  // Implicación p → q es equivalente a !p ∨ q
+            .replace(/(\w)\s*>\s*(\w)/g, "!$1 || $2")  // Implicación p → q es equivalente a !p ∨ q
             .replace(/↔/g, "==="); // Bicondicional p ↔ q es equivalente a (p && q) || (!p && !q)
 
         for (const [variable, value] of Object.entries(values)) {
