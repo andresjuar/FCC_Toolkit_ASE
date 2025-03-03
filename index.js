@@ -72,6 +72,9 @@ document.addEventListener("DOMContentLoaded", function () {                     
             .replace(/v/g, "||") // Disyunción
             .replace(/(\w)\s*→\s*(\w)/g, "!$1 || $2")  // Implicación p → q es equivalente a !p ∨ q
             .replace(/(\w)\s*>\s*(\w)/g, "!$1 || $2")  // Implicación p → q es equivalente a !p ∨ q
+            .replace(/(\(.+?\)|\w+)\s*→\s*(\(.+?\)|\w+)/g, "!$1 || $2")
+            .replace(/(\(.+?\)|\w+)\s*>\s*(\(.+?\)|\w+)/g, "!$1 || $2")
+
             .replace(/↔/g, "==="); // Bicondicional p ↔ q es equivalente a (p && q) || (!p && !q)
 
         for (const [variable, value] of Object.entries(values)) {
