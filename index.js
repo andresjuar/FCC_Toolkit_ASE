@@ -67,23 +67,26 @@ document.addEventListener("DOMContentLoaded", function () {                     
         let expr = expresion.toLowerCase()
             .replace(/¬/g, "!")  // Negación
             .replace(/~/g, "!")  // Alternativa de negación
-            .replace(/∧/g, "&&") // Conjunción
-            .replace(/\^/g, "&&") //Conjunción
             .replace(/v/g, "||") // Disyunción
-            .replace(/(\w)\s*→\s*(\w)/g, "!$1 || $2")  // Implicación p → q es equivalente a !p ∨ q
-            .replace(/(\w)\s*>\s*(\w)/g, "!$1 || $2")  // Implicación p → q es equivalente a !p ∨ q
-            .replace(/(\(.+?\)|\w+)\s*→\s*(\(.+?\)|\w+)/g, "!$1 || $2")
-            .replace(/(\(.+?\)|\w+)\s*>\s*(\(.+?\)|\w+)/g, "!$1 || $2")
+            .replace(/↔/g, "==="); // Bicondicional p ↔ q
+    
+        // Asegurar que todas las conjunciones estén dentro de paréntesis
+        expr = expr.replace(/(\w+(\s*[∧^]\s*\w+)+)/g, "($1)").replace(/\^/g, "&&");
 
-            .replace(/↔/g, "==="); // Bicondicional p ↔ q es equivalente a (p && q) || (!p && !q)
-
+        // Reemplazar la implicación
+        expr = expr.replace(/(\(.+?\)|\w+)\s*→\s*(\(.+?\)|\w+)/g, "!($1) || ($2)");
+    
+        console.log("Expresión final procesada:", expr);
+    
+        // Sustituir las variables con sus valores en la tabla de verdad
         for (const [variable, value] of Object.entries(values)) {
             const regex = new RegExp(`\\b${variable}\\b`, "g");
             expr = expr.replace(regex, value);
         }
-
+    
         return Boolean(new Function(`return ${expr};`)());
     }
+    
 
 
     function extractSubexpresiones(expression) {
